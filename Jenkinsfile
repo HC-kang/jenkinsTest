@@ -19,6 +19,7 @@ pipeline {
             agent any
             
             steps {
+                // echo 'Lets start Long Journey! ENV: ${ENV}'
                 echo 'Clonning Repository'
 
                 git url: 'https://github.com/HC-kang/jenkinsTest.git',
@@ -141,8 +142,9 @@ pipeline {
 
             dir ('./server'){
                 sh """
-                docker build . -t server --build-arg env=${PROD}
+                docker build . -t server
                 """
+                // docker build . -t server --build-arg env=${PROD}
             }
           }
 
