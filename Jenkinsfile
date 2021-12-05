@@ -93,6 +93,27 @@ pipeline {
                   '''
               }
             }
+
+            post {
+              // If Maven was able to run the tests, even if some of the test
+              // failed, record the test results and archive the jar file.
+              success {
+                  echo 'Successfully Cloned Repository'
+
+                  mail  to: 'weston0713@gmail.com',
+                        subject: "LintBackend Success",
+                        body: "Successfully deployed frontend!"
+
+              }
+
+              failure {
+                  echo 'I failed :('
+
+                  mail  to: 'weston0713@gmail.com',
+                        subject: "Failed Pipelinee",
+                        body: "Something is wrong with linting Backend"
+              }
+          }
         }
         
         stage('Test Backend') {
@@ -140,9 +161,9 @@ pipeline {
 
             dir ('./server'){
                 sh '''
-                docker rm -f $(docker ps -aq)
                 docker run -p 80:80 -d server
                 '''
+                // docker rm -f $(docker ps -aq)
             }
           }
 
