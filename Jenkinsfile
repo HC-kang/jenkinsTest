@@ -18,7 +18,7 @@ pipeline {
             agent any
 
             steps {
-                echo "lets start Long Journey! ENV: ${ENV}"
+                // echo "lets start Long Journey! ENV: ${ENV}"
                 echo "Clonning Repository"
 
                 git url: 'https://github.com/HC-kang/jenkinsTest.git',
