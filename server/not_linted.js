@@ -1,2 +1,2 @@
-const a =        "dfsdf";
+const a = "dfsdf";
 console.log(a);

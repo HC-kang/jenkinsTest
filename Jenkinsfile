@@ -171,11 +171,11 @@ pipeline {
             echo 'Build Backend'
 
             dir ('./server'){
+                // docker rm -f $(docker ps -aq)
                 sh '''
-                docker rm -f $(docker ps -aq)
                 docker run -p 80:80 -d server
                 '''
-            } // rm -f 의 경우 
+            } // rm -f 의 경우 이전 컨테이너를 죽이는 코드이니, 첫 빌드에서는 지워줘야 함! 
           }
 
           post {
