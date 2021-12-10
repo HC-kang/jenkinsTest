@@ -2,42 +2,52 @@ pipeline {
     // 스테이지 별로 다른 거
     agent any
 
-    triggers {
-        pollSCM('*/3 * * * *')
+          triggers {
+            // # ┌───────────── min (0 - 59)
+            // # │   ┌────────────── hour (0 - 23)
+            // # │   │ ┌─────────────── day of month (1 - 31)
+            // # │   │ │ ┌──────────────── month (1 - 12)
+            // # │   │ │ │ ┌───────────────── day of week (0 - 6) (0 to 6 are Sunday to Saturday, or use names; 7 is Sunday, the same as 0)
+            // # │   │ │ │ │
+            // # │   │ │ │ │
+            // # *   * * * *  command to execute
+        pollSCM('*/3 * * * *') // cron syntax
     }
 
     environment {
+      // AWS의 Jenkins IAM의 권한을 가질 수 있게하기 위함.
       AWS_ACCESS_KEY_ID = credentials('awsAccessKeyId')
       AWS_SECRET_ACCESS_KEY = credentials('awsSecretAccessKey')
       AWS_DEFAULT_REGION = 'ap-northeast-2'
-      HOME = '.' // Avoid npm root owned
+      HOME = '.' 
     }
 
     stages {
-        // 레포지토리를 다운로드 받음
+        // 레포지토리를 다운로드 받음. '준비' 단계
         stage('Prepare') {
+            // 아무 node나
             agent any
             
             steps {
-                // echo 'Lets start Long Journey! ENV: ${ENV}'
+                // echo 'Lets start Long Journey! ENV: ${ENV}' -> ENV의 환경변수를 보여주기, 현재는 지정 안 되어 있어서 주석처리함.
                 echo 'Clonning Repository'
 
                 git url: 'https://github.com/HC-kang/jenkinsTest.git',
                     branch: 'master',
                     credentialsId: 'Jenkins'
+                    // ㄴ여기도 Jenkins의 credential. jenkins의 토큰 필요
             }
 
             post {
-                // If Maven was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
+                // 성공시?
                 success {
                     echo 'Successfully Cloned Repository'
                 }
-
+                // 항상
                 always {
                   echo "i tried..."
                 }
-
+                // 완료 후
                 cleanup {
                   echo "after all other post condition"
                 }
@@ -57,11 +67,10 @@ pipeline {
           }
 
           post {
-              // If Maven was able to run the tests, even if some of the test
-              // failed, record the test results and archive the jar file.
               success {
                   echo 'Successfully Cloned Repository'
-
+                  
+                  // 성공하면 메일을 보내게 설정
                   mail  to: 'weston0713@gmail.com',
                         subject: "Deploy Frontend Success",
                         body: "Successfully deployed frontend!"
@@ -144,7 +153,7 @@ pipeline {
                 sh """
                 docker build . -t server
                 """
-                // docker build . -t server --build-arg env=${PROD}
+                // docker build . -t server --build-arg env=${PROD} -> 여기도 Production 환경변수가 지정되어있지 않아 제거.
             }
           }
 
@@ -166,7 +175,7 @@ pipeline {
                 docker rm -f $(docker ps -aq)
                 docker run -p 80:80 -d server
                 '''
-            }
+            } // rm -f 의 경우 
           }
 
           post {

@@ -1,2 +1,2 @@
-const a = 'dfsdf';
-console.log(a)
+const a =        "dfsdf";
+console.log(a);
